@@ -1,0 +1,30 @@
+Global frequency set at 1000000000000 ticks per second
+src/mem/dram_interface.cc:690: warn: DRAM device capacity (8192 Mbytes) does not match the address range assigned (256 Mbytes)
+src/base/statistics.hh:279: warn: One of the stats is a legacy stat. Legacy stat is a stat that does not belong to any statistics::Group. Legacy stat is deprecated.
+board.remote_gdb: Listening for connections on port 7000
+gem5 Simulator System.  https://www.gem5.org
+gem5 is copyrighted software; use the --copyright option for details.
+
+gem5 version 23.1.0.0
+gem5 compiled Feb 19 2026 15:52:45
+gem5 started Jun  4 2026 12:58:05
+gem5 executing on grey, pid 5492
+command line: /home/greyghst/gem5/build/X86/gem5.opt -d /home/greyghst/gem5-orkom/results/raw/random_l1_16k /home/greyghst/gem5-orkom/configs/run_array_cache.py --binary /home/greyghst/gem5-orkom/build/array_access --mode random --cache l1_16k --size 131072 --repeats 8 --stride 16
+
+Experiment configuration:
+  binary : /home/greyghst/gem5-orkom/build/array_access
+  mode   : random
+  cache  : l1_16k
+  size   : 131072
+  repeats: 8
+  stride : 16
+  clk    : 3GHz
+  memory : 256MiB
+src/sim/simulate.cc:199: info: Entering event queue @ 0.  Starting simulation...
+src/sim/syscall_emul.cc:74: warn: ignoring syscall set_robust_list(...)
+src/sim/syscall_emul.cc:74: warn: ignoring syscall rseq(...)
+src/sim/mem_state.cc:448: info: Increasing stack size by one page.
+src/sim/syscall_emul.hh:1014: warn: readlink() called on '/proc/self/exe' may yield unexpected results in various settings.
+      Returning '/home/greyghst/gem5-orkom/build/array_access'
+src/sim/syscall_emul.cc:74: warn: ignoring syscall mprotect(...)
+mode=random size=131072 repeats=8 stride=16 checksum=34359214080

@@ -1,0 +1,51 @@
+# Build artifacts
+build/
+*.o
+*.out
+*.exe
+*.bin
+*.elf
+*.a
+*.so
+
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temporary files
+*.tmp
+*.temp
+*.bak
+*.log
+
+# Keep selected Gem5 experiment logs under results/raw/.
+!results/raw/*/terminal.log
+
+# Gem5 raw output can be regenerated and is verbose. Keep stats and terminal logs.
+results/raw/**
+!results/raw/
+!results/raw/*/
+!results/raw/*/stats.txt
+!results/raw/*/terminal.log
+
+# Keep final summaries tracked.
+!results/summary.csv
+!results/summary.md
