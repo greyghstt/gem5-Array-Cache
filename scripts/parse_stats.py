@@ -114,6 +114,18 @@ def fmt(value):
     return str(value)
 
 
+def fmt_ticks(value):
+    if value is None:
+        return ""
+    return f"{float(value) / 1_000_000_000:.2f}B"
+
+
+def fmt_rate(value):
+    if value is None:
+        return "-"
+    return f"{float(value):.4f}"
+
+
 def extract_cache_stats(stats):
     # Nama statistik cache pada Gem5 dapat berbeda tergantung versi dan objek cache.
     # Parser ini dibuat longgar agar tetap bisa mengambil data jika nama statistik mengandung
@@ -228,21 +240,19 @@ def main():
 
     with md_path.open("w") as f:
         f.write("# Summary Hasil Eksperimen Gem5\n\n")
-        f.write("Format ringkas untuk dibaca langsung dengan `cat`.\n")
-        f.write("Detail lengkap tersedia di `results/summary.csv`.\n\n")
-
-        current_mode = None
+        f.write("Parameter: SIZE=131072, REPEATS=8, STRIDE=16\n")
+        f.write("Catatan: simTicks lebih rendah lebih baik; IPC lebih tinggi lebih baik.\n")
+        f.write("Detail lengkap: results/summary.csv\n\n")
+        f.write("Mode    Cache     simTicks    IPC     L1D_miss\n")
+        f.write("------  --------  ----------  ------  --------\n")
 
         for row in rows:
-            if row["mode"] != current_mode:
-                current_mode = row["mode"]
-                f.write(f"## Mode: {current_mode}\n\n")
-
-            miss_rate = fmt(row["l1d_miss_rate"]) or "-"
-            f.write(f"- {row['cache']}\n")
-            f.write(f"  simTicks      : {fmt(row['simTicks'])}\n")
-            f.write(f"  IPC           : {fmt(row['IPC'])}\n")
-            f.write(f"  L1D miss rate : {miss_rate}\n\n")
+            f.write(
+                f"{row['mode']:<6}  {row['cache']:<8}  "
+                f"{fmt_ticks(row['simTicks']):>10}  "
+                f"{fmt_rate(row['IPC']):>6}  "
+                f"{fmt_rate(row['l1d_miss_rate']):>8}\n"
+            )
 
     print(f"Wrote {csv_path}")
     print(f"Wrote {md_path}")
