@@ -228,14 +228,14 @@ def main():
 
     with md_path.open("w") as f:
         f.write("# Summary Hasil Eksperimen Gem5\n\n")
-        f.write("| Mode | Cache | simTicks | simInsts | numCycles | IPC | L1D Miss Rate | L1D Misses | L1D Hits |\n")
-        f.write("|---|---:|---:|---:|---:|---:|---:|---:|---:|\n")
+        f.write("Tabel compact untuk dibaca cepat di terminal. Detail lengkap tersedia di `summary.csv`.\n\n")
+        f.write("| Mode | Cache | simTicks | IPC | L1D Miss Rate |\n")
+        f.write("|---|---:|---:|---:|---:|\n")
 
         for row in rows:
             f.write(
                 f"| {row['mode']} | {row['cache']} | {fmt(row['simTicks'])} | "
-                f"{fmt(row['simInsts'])} | {fmt(row['numCycles'])} | {fmt(row['IPC'])} | "
-                f"{fmt(row['l1d_miss_rate'])} | {fmt(row['l1d_misses'])} | {fmt(row['l1d_hits'])} |\n"
+                f"{fmt(row['IPC'])} | {fmt(row['l1d_miss_rate'])} |\n"
             )
 
     print(f"Wrote {csv_path}")
