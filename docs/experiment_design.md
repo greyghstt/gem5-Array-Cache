@@ -1,32 +1,31 @@
 # Desain Eksperimen
 
-Dokumen ini menjelaskan desain eksperimen project "Analisis Pengaruh
-Konfigurasi Cache dan Pola Akses Memori terhadap Performa Program Array
-Traversal Menggunakan Gem5".
-
-## Tujuan
-
-Eksperimen dirancang untuk mengamati bagaimana pola akses memori dan konfigurasi
-cache memengaruhi performa program array traversal. Performa diamati melalui
-metrik Gem5 seperti `simTicks`, `numCycles`, IPC, dan L1D miss rate.
+Dokumen ini merangkum rancangan eksperimen cache pada benchmark array traversal
+menggunakan Gem5.
 
 ## Platform
 
-- Simulator: Gem5 23.1.0.0
-- Lingkungan: WSL Ubuntu
-- Path Gem5: `/home/greyghst/gem5`
-- Path project: `/home/greyghst/gem5-orkom`
-- ISA: X86
-- CPU model: `TIMING`
-- Memori: `SingleChannelDDR3_1600`
+- Simulator: Gem5 23.1.0.0.
+- Mode simulasi: syscall emulation.
+- ISA: X86.
+- CPU: `TIMING`.
+- Memori: `SingleChannelDDR3_1600`.
+
+Gem5 digunakan untuk memodelkan CPU, memori, dan hierarki cache sehingga dampak
+konfigurasi cache terhadap performa program dapat diamati secara terukur.
 
 ## Benchmark
 
-Benchmark utama adalah `src/array_access.c`. Program mengalokasikan array
-integer, mengisi data secara deterministik, lalu melakukan traversal berdasarkan
-mode akses yang diberikan melalui argumen command line.
+Benchmark berada di `src/array_access.c`. Program melakukan penjumlahan elemen
+array dengan tiga mode akses:
 
-Parameter final benchmark:
+| Mode | Karakteristik |
+|---|---|
+| `seq` | Akses berurutan dengan spatial locality tinggi. |
+| `stride` | Akses berjarak tetap dengan `STRIDE=16`. |
+| `random` | Akses acak deterministik dengan locality rendah. |
+
+Parameter final:
 
 | Parameter | Nilai |
 |---|---:|
@@ -34,29 +33,19 @@ Parameter final benchmark:
 | `REPEATS` | 8 |
 | `STRIDE` | 16 |
 
-## Faktor Eksperimen
+## Konfigurasi Cache
 
-Desain eksperimen menggunakan kombinasi 3 mode akses memori dan 4 konfigurasi
-cache. Total simulasi adalah 3 x 4 = 12 percobaan.
-
-### Mode Akses Memori
-
-| Mode | Penjelasan |
+| Konfigurasi | Deskripsi |
 |---|---|
-| `seq` | Akses array secara berurutan dari indeks awal sampai akhir. |
-| `stride` | Akses array dengan jarak indeks tetap, yaitu `STRIDE=16`. |
-| `random` | Akses array menggunakan urutan indeks acak deterministik. |
+| `nocache` | Tanpa cache antara CPU dan memori utama. |
+| `l1_16k` | L1 instruction cache dan L1 data cache 16 KiB. |
+| `l1_32k` | L1 instruction cache dan L1 data cache 32 KiB. |
+| `l1_l2` | L1 32 KiB dan L2 256 KiB. |
 
-### Konfigurasi Cache
+## Matriks Eksperimen
 
-| Cache | Penjelasan |
-|---|---|
-| `nocache` | Tidak ada cache antara CPU dan memori utama. |
-| `l1_16k` | L1 instruction cache 16 KiB dan L1 data cache 16 KiB. |
-| `l1_32k` | L1 instruction cache 32 KiB dan L1 data cache 32 KiB. |
-| `l1_l2` | L1 instruction/data cache 32 KiB dan L2 cache 256 KiB. |
-
-## Matriks Percobaan
+Eksperimen menggunakan desain 3 x 4: tiga mode akses memori dan empat
+konfigurasi cache. Total simulasi adalah 12 percobaan.
 
 | Mode | nocache | l1_16k | l1_32k | l1_l2 |
 |---|---|---|---|---|
@@ -64,35 +53,20 @@ cache. Total simulasi adalah 3 x 4 = 12 percobaan.
 | `stride` | Ya | Ya | Ya | Ya |
 | `random` | Ya | Ya | Ya | Ya |
 
-## Alur Eksperimen
+## Alur Eksekusi
 
-1. `scripts/run_all.sh` memeriksa keberadaan binary Gem5.
-2. Script mengompilasi `src/array_access.c` menjadi `build/array_access`.
-3. Script menjalankan simulasi untuk seluruh kombinasi mode dan cache.
-4. Gem5 menulis output raw ke `results/raw/<mode>_<cache>/`.
-5. `scripts/parse_stats.py` membaca `stats.txt` dari setiap percobaan.
-6. Parser membuat `results/summary.csv` dan `results/summary.md`.
+1. `scripts/run_all.sh` mengompilasi benchmark menjadi `build/array_access`.
+2. Script menjalankan seluruh kombinasi mode akses dan cache pada Gem5.
+3. Output setiap simulasi disimpan ke `results/raw/<mode>_<cache>/`.
+4. `scripts/parse_stats.py` mengambil metrik penting dari `stats.txt`.
+5. Ringkasan akhir ditulis ke `results/summary.csv` dan `results/summary.md`.
 
-## Metrik yang Diamati
+## Metrik
 
-- `simTicks`: total waktu simulasi dalam tick Gem5.
+- `simTicks`: total tick simulasi.
 - `simInsts`: jumlah instruksi yang disimulasikan.
 - `numCycles`: jumlah siklus CPU.
 - `IPC`: instruksi per siklus.
 - `L1D Miss Rate`: rasio miss pada L1 data cache.
-- `L1D Misses` dan `L1D Hits`: jumlah miss dan hit pada L1 data cache.
 
-Pada konfigurasi `nocache`, metrik L1D kosong karena tidak ada L1 data cache
-yang dimodelkan.
-
-## Catatan Reproduksi
-
-Eksperimen dapat dijalankan ulang dengan command berikut:
-
-```bash
-cd ~/gem5-orkom
-bash scripts/run_all.sh
-cat results/summary.md
-```
-
-Menjalankan ulang eksperimen akan memperbarui file hasil di `results/`.
+Pada `nocache`, metrik L1D kosong karena tidak ada data cache L1 yang dimodelkan.
